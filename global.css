@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* RN Web maps TextInput to <input>; remove default focus ring so rounded row border shows */
+.login-screen input:focus,
+.login-screen input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.modal-form input:focus,
+.modal-form input:focus-visible,
+.modal-form textarea:focus,
+.modal-form textarea:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.profile-form input:focus,
+.profile-form input:focus-visible,
+.profile-form textarea:focus,
+.profile-form textarea:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

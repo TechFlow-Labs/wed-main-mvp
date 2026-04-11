@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Διαχείριση Κρατήσεων Γάμων",
+    "slug": "wed-main-mvp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#F8F4F2"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "gr.wedapp.wedmainmvp"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F8F4F2"
+      },
+      "package": "gr.wedapp.wedmainmvp"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-image-picker",
+      "expo-font"
+    ],
+    "scheme": "wed-main-mvp"
+  }
+}
