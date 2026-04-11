@@ -42,5 +42,3 @@ Expo version of the Wedding Reservations app—runs on **web**, **iOS**, and **A
 - `expo-image-picker` for image selection
 - `Linking.openURL()` for `mailto:`, `tel:`, and calendar links
 - Print only on web (via `window.print()`)
-# wed-main-mvp
-# wed-main-mvp
