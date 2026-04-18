@@ -1,4 +1,4 @@
-import type { WeddingReservation } from './database.types';
+import type { WeddingReservation } from './weddingReservationTypes';
 import type { ReservationsSchema } from './reservationTypes';
 import { toLocalYmd } from './dateUtils';
 

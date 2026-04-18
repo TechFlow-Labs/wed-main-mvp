@@ -10,13 +10,14 @@ Expo version of the Wedding Reservations app—runs on **web**, **iOS**, and **A
    npm install
    ```
 
-2. **Configure environment**  
-   Ensure `.env` contains:
+2. **Configure environment** (optional)  
+   Point the app at your Wedding Plan API (defaults to `http://localhost:8060`):
 
    ```
-   EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   EXPO_PUBLIC_API_URL=http://localhost:8060
    ```
+
+   **Web + API on different ports** triggers browser CORS unless the API sends CORS headers. Options: enable CORS on the API, or use a **same-origin proxy** (the Docker image uses `/api` → see below).
 
 ## Run
 
@@ -35,12 +36,11 @@ npm run build:web
 
 This creates the `dist/` directory used by the Docker image.
 
-## Docker deploy (static `dist/` + Nginx)
+## Docker deploy (Nginx + API proxy)
 
-The included Docker setup serves `dist/` via Nginx and proxies same-origin `/api/*`
-requests to `host.docker.internal:8060`.
+The **Docker build** sets `EXPO_PUBLIC_API_URL=/api` so the browser only talks to the same origin. Nginx forwards `/api/...` to `http://host.docker.internal:8060/...` (your OpenAPI server on the host). Rebuild the image after changing API proxy settings.
 
-1. Build and start container:
+1. Build and start container (build runs `expo export` inside the image with `/api`):
 
    ```bash
    npm run docker:up
@@ -52,20 +52,22 @@ requests to `host.docker.internal:8060`.
    npm run docker:down
    ```
 
+Ensure the API is listening on **port 8060** on the machine that runs Docker (`host.docker.internal`).
+
 If you prefer explicit commands:
 
 ```bash
-npm run build:web
 docker compose up -d --build
 ```
+
+For a **local static `dist/`** test without Docker, either point the API at `http://localhost:8060` and enable CORS there, or build with `EXPO_PUBLIC_API_URL=/api` and serve behind any reverse proxy to `:8060`.
 
 ## Project structure
 
 - `app/` – Expo Router routes (layout, index)
 - `components/` – Shared UI (Navbar, Calendar, ReservationsList, App)
 - `components/pages/` – Dashboard, Profile, EventRequests, ReservationDetail
-- `lib/` – Supabase client, database types, profile types
-- `supabase/` – Migrations (unchanged from original)
+- `lib/` – REST API clients (`fetch` to OpenAPI backend), types, mappers
 
 ## Differences from original Vite app
 

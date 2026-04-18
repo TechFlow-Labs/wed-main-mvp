@@ -25,7 +25,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getPendingReservations, patchReservation } from '../../lib/reservationsApi';
 import type { ReservationsSchema } from '../../lib/reservationTypes';
 import { apiReservationToWeddingReservation, eventDateToYmd } from '../../lib/reservationMappers';
-import type { WeddingReservation } from '../../lib/database.types';
+import type { WeddingReservation } from '../../lib/weddingReservationTypes';
 
 interface EventRequestsProps {
   onBack: () => void;
