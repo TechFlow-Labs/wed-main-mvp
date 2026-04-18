@@ -2,22 +2,18 @@ services:
   web:
     build: .
     image: wedding-reservations-web:latest
+    hostname: wedmainapp
+    container_name: wedmainapp
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-www:/var/www/certbot
+      - "81:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      local_sandbox_2:
+        ipv4_address: 172.27.0.80
     restart: unless-stopped
 
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - certbot-www:/var/www/certbot
-
-volumes:
-  certbot-etc:
-  certbot-var:
-  certbot-www:
+networks:
+  local_sandbox_2:
+    external: true
+    name: local_sandbox_2

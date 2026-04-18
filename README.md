@@ -25,6 +25,40 @@ Expo version of the Wedding Reservations app—runs on **web**, **iOS**, and **A
 - **Android**: `npm run android` or `npx expo start --android`
 - **All platforms**: `npm start` then press `w` for web, `i` for iOS, `a` for Android
 
+## Build static web output (`dist/`)
+
+Generate a production web build for Nginx/Docker:
+
+```bash
+npm run build:web
+```
+
+This creates the `dist/` directory used by the Docker image.
+
+## Docker deploy (static `dist/` + Nginx)
+
+The included Docker setup serves `dist/` via Nginx and proxies same-origin `/api/*`
+requests to `host.docker.internal:8060`.
+
+1. Build and start container:
+
+   ```bash
+   npm run docker:up
+   ```
+
+2. Stop container:
+
+   ```bash
+   npm run docker:down
+   ```
+
+If you prefer explicit commands:
+
+```bash
+npm run build:web
+docker compose up -d --build
+```
+
 ## Project structure
 
 - `app/` – Expo Router routes (layout, index)
