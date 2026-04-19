@@ -165,6 +165,16 @@ export async function fetchAllReservations(
   return Array.from(byId.values());
 }
 
+/** Loads a single reservation by id from merged pending + accepted lists. */
+export async function getReservationById(
+  accessToken: string,
+  tokenType: string,
+  reservationId: string
+): Promise<ReservationsSchema | null> {
+  const all = await fetchAllReservations(accessToken, tokenType);
+  return all.find((r) => r.id === reservationId) ?? null;
+}
+
 /**
  * PATCH /reservations/{reservation_id} — Update Reservation (OpenAPI).
  */

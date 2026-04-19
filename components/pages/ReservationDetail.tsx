@@ -28,11 +28,10 @@ import {
   CalendarPlus,
   Download
 } from 'lucide-react-native';
-import { supabase } from '../../lib/supabase';
-import type { WeddingReservation } from '../../lib/database.types';
+import type { WeddingReservation } from '../../lib/weddingReservationTypes';
 import { GuestsModal } from '../GuestsModal';
 import { useAuth } from '../../contexts/AuthContext';
-import { patchReservation } from '../../lib/reservationsApi';
+import { getReservationById, patchReservation } from '../../lib/reservationsApi';
 import { apiReservationToWeddingReservation } from '../../lib/reservationMappers';
 import { toLocalYmd, ymdStringToLocalDate } from '../../lib/dateUtils';
 import { InterestedDatesDisplay } from '../InterestedDatesDisplay';
@@ -69,7 +68,7 @@ const STATUS_OPTIONS: { value: EditStatusUi; label: string }[] = [
 
 interface ReservationDetailProps {
   reservationId: string;
-  /** When set (e.g. from API list), skips Supabase fetch for this id */
+  /** When set (e.g. from API list), skips API fetch for this id */
   initialReservation?: WeddingReservation | null;
   onBack: () => void;
 }
@@ -95,7 +94,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
       return;
     }
     loadReservation();
-  }, [reservationId, initialReservation]);
+  }, [reservationId, initialReservation, token]);
 
   useEffect(() => {
     if (!showEditReservationModal || !reservation) return;
@@ -145,17 +144,18 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
   };
 
   const loadReservation = async () => {
+    if (!token) {
+      setReservation(null);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('wedding_reservations')
-        .select('*')
-        .eq('id', reservationId)
-        .maybeSingle();
-      if (error) throw error;
-      setReservation(data);
+      const api = await getReservationById(token.access_token, token.token_type, reservationId);
+      setReservation(api ? apiReservationToWeddingReservation(api) : null);
     } catch (err) {
       console.error(err);
+      setReservation(null);
     } finally {
       setLoading(false);
     }

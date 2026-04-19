@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { Calendar } from '../Calendar';
 import { ReservationsList } from '../ReservationsList';
-import type { WeddingReservation } from '../../lib/database.types';
+import type { WeddingReservation } from '../../lib/weddingReservationTypes';
 import { Calendar as CalendarIcon, ChevronRight } from 'lucide-react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchAllReservations } from '../../lib/reservationsApi';

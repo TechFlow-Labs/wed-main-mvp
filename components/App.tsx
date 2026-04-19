@@ -10,7 +10,7 @@ import { EventRequests } from './pages/EventRequests';
 import { PartnerExpenses } from './pages/PartnerExpenses';
 import { NotesScreen } from './pages/NotesScreen';
 
-import type { WeddingReservation } from '../lib/database.types';
+import type { WeddingReservation } from '../lib/weddingReservationTypes';
 
 type ViewState =
   | { type: 'home' }

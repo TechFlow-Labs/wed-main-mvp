@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { Calendar as CalendarIcon, Users, Mail, Phone, MapPin, Plus } from 'lucide-react-native';
-import type { WeddingReservation } from '../lib/database.types';
+import type { WeddingReservation } from '../lib/weddingReservationTypes';
 import { AddReservationModal } from './AddReservationModal';
 
 interface ReservationsListProps {
