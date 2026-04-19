@@ -26,4 +26,8 @@ export type ReservationsSchema = {
   couple_last_name?: string | null;
   guests?: GuestDashboard[];
   notes?: unknown[];
+  interested_dates?: string | null;
+  guest_count?: number | null;
+  event_type?: string | null;
+  other_comments?: string | null;
 };
