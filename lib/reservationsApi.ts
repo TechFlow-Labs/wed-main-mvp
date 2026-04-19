@@ -9,7 +9,7 @@ export type ReservationsUpdatePayload = {
   budget_per_reservation?: number | string | null;
 };
 
-/** OpenAPI components/schemas/ReservationAcceptedCreateSchema */
+/** OpenAPI components/schemas/ReservationAcceptedCreateSchema (wed-backend) */
 export type ReservationAcceptedCreate = {
   guest_first_name: string;
   guest_last_name: string;
@@ -18,6 +18,10 @@ export type ReservationAcceptedCreate = {
   event_date?: string | null;
   details?: string | null;
   budget_per_reservation?: number | string | null;
+  interested_dates?: string | null;
+  guest_count?: number | null;
+  event_type?: string | null;
+  other_comments?: string | null;
 };
 
 /**
@@ -57,7 +61,7 @@ export async function createAcceptedReservation(
   body: ReservationAcceptedCreate
 ): Promise<unknown> {
   const url = `${getApiBaseUrl()}/reservations/accepted`;
-  const payload = {
+  const payload: Record<string, unknown> = {
     guest_first_name: body.guest_first_name.trim(),
     guest_last_name: body.guest_last_name.trim(),
     guest_email: body.guest_email.trim(),
@@ -69,6 +73,18 @@ export async function createAcceptedReservation(
         ? null
         : body.budget_per_reservation,
   };
+  if (body.interested_dates !== undefined) {
+    payload.interested_dates = body.interested_dates?.trim() ? body.interested_dates.trim() : null;
+  }
+  if (body.guest_count !== undefined && body.guest_count !== null) {
+    payload.guest_count = body.guest_count;
+  }
+  if (body.event_type !== undefined) {
+    payload.event_type = body.event_type?.trim() ? body.event_type.trim() : null;
+  }
+  if (body.other_comments !== undefined) {
+    payload.other_comments = body.other_comments?.trim() ? body.other_comments.trim() : null;
+  }
 
   const res = await fetch(url, {
     method: 'POST',

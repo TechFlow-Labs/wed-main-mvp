@@ -11,7 +11,6 @@ import {
   FileText,
   Clock,
   MessageCircle,
-  PieChart,
   X,
   UtensilsCrossed,
   CheckCircle2,
@@ -63,15 +62,6 @@ function generateMockGuests(count: number): Guest[] {
     notes: i % 7 === 0 ? 'VIP - οικογένεια νυφίου' : i % 11 === 0 ? 'Παιδικό κάθισμα' : null
   }));
 }
-
-const MOCK_BUDGET_BREAKDOWN = [
-  { category: 'Χώρος & Δεξιώσεις', amount: 0.35, label: 'Χώρος και δεξιώσεις' },
-  { category: 'Φωτογραφία & Βίντεο', amount: 0.22, label: 'Φωτογραφία και βίντεο' },
-  { category: 'Καταλύματα Προσκεκλημένων', amount: 0.18, label: 'Διαμονή προσκεκλημένων' },
-  { category: 'Λουλούδια & Διακόσμηση', amount: 0.12, label: 'Λουλούδια και διακόσμηση' },
-  { category: 'Μουσική & DJ', amount: 0.08, label: 'Μουσική και ψυχαγωγία' },
-  { category: 'Τροφή & Ποτά', amount: 0.05, label: 'Επιπλέον τροφή και ποτά' },
-];
 
 export function ReservationDetail({ reservationId, onBack }: ReservationDetailProps) {
   const [reservation, setReservation] = useState<WeddingReservation | null>(null);
@@ -436,10 +426,6 @@ export function ReservationDetail({ reservationId, onBack }: ReservationDetailPr
                       <p className="text-base font-semibold text-gray-900">
                         ${reservation.budget.toLocaleString()}
                       </p>
-                      <p className="text-xs text-wed-accent mt-0.5 flex items-center gap-1">
-                        <PieChart className="w-3.5 h-3.5" />
-                        Κλικ για ανάλυση
-                      </p>
                     </div>
                   </button>
                 )}
@@ -538,8 +524,8 @@ export function ReservationDetail({ reservationId, onBack }: ReservationDetailPr
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-wed-primary to-wed-primary-light">
               <div className="flex items-center gap-2">
-                <PieChart className="w-6 h-6 text-white" />
-                <h2 className="text-xl font-semibold text-white">Ανάλυση Προϋπολογισμού</h2>
+                <DollarSign className="w-6 h-6 text-white" />
+                <h2 className="text-xl font-semibold text-white">Προϋπολογισμός</h2>
               </div>
               <button
                 onClick={() => setShowBudgetAnalysis(false)}
@@ -550,38 +536,8 @@ export function ReservationDetail({ reservationId, onBack }: ReservationDetailPr
               </button>
             </div>
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-5rem)]">
-              <div className="mb-6">
-                <p className="text-sm text-gray-500 mb-1">Συνολικός προϋπολογισμός</p>
-                <p className="text-2xl font-bold text-gray-900">${reservation.budget.toLocaleString()}</p>
-              </div>
-              <div className="space-y-4">
-                {MOCK_BUDGET_BREAKDOWN.map((item) => {
-                  const amount = Math.round(reservation.budget * item.amount);
-                  const percent = Math.round(item.amount * 100);
-                  return (
-                    <div key={item.category} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium text-gray-900">{item.category}</span>
-                        <span className="text-gray-600">
-                          ${amount.toLocaleString()} ({percent}%)
-                        </span>
-                      </div>
-                      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-wed-accent rounded-full transition-all duration-500 shadow-sm"
-                          style={{ width: `${percent}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <div className="flex justify-between text-sm font-semibold text-gray-900">
-                  <span>Σύνολο</span>
-                  <span>${reservation.budget.toLocaleString()}</span>
-                </div>
-              </div>
+              <p className="text-sm text-gray-500 mb-1">Συνολικός προϋπολογισμός</p>
+              <p className="text-2xl font-bold text-gray-900">${reservation.budget.toLocaleString()}</p>
             </div>
           </div>
         </div>

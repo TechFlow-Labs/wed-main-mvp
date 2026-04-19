@@ -51,18 +51,26 @@ export function apiReservationToWeddingReservation(r: ReservationsSchema): Weddi
   const budgetNum =
     raw != null && raw !== '' ? parseFloat(String(raw).replace(',', '.')) : NaN;
 
+  const guestListLen = Array.isArray(r.guests) ? r.guests.length : 0;
+  const guest_count =
+    typeof r.guest_count === 'number' && r.guest_count >= 0 ? r.guest_count : guestListLen;
+
+  const eventType = r.event_type?.trim() || '';
+
   return {
     id: r.id,
     client_name,
     wedding_date,
     venue: r.business_name?.trim() || (r.details && r.details.trim()) || '—',
-    guest_count: Array.isArray(r.guests) ? r.guests.length : 0,
+    guest_count,
     contact_email: r.guest_email || '',
     contact_phone: r.guest_phone || '',
     status: mapStatus(r.status),
-    package_type: '',
+    package_type: eventType,
     budget: Number.isFinite(budgetNum) ? budgetNum : 0,
     notes: r.details || '',
+    interested_dates: r.interested_dates ?? null,
+    other_comments: r.other_comments ?? null,
     created_at: r.event_date || new Date().toISOString(),
     updated_at: r.event_date || new Date().toISOString(),
   };

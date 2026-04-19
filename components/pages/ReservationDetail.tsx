@@ -22,7 +22,6 @@ import {
   Package,
   FileText,
   Clock,
-  PieChart,
   X,
   Pencil,
   UserPlus,
@@ -35,6 +34,9 @@ import { GuestsModal } from '../GuestsModal';
 import { useAuth } from '../../contexts/AuthContext';
 import { patchReservation } from '../../lib/reservationsApi';
 import { apiReservationToWeddingReservation } from '../../lib/reservationMappers';
+import { toLocalYmd, ymdStringToLocalDate } from '../../lib/dateUtils';
+import { InterestedDatesDisplay } from '../InterestedDatesDisplay';
+import { EventDatePickerField } from '../EventDatePickerField';
 
 type EditStatusUi = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
@@ -72,15 +74,6 @@ interface ReservationDetailProps {
   onBack: () => void;
 }
 
-const MOCK_BUDGET_BREAKDOWN = [
-  { category: 'Χώρος & Δεξιώσεις', amount: 0.35 },
-  { category: 'Φωτογραφία & Βίντεο', amount: 0.22 },
-  { category: 'Καταλύματα', amount: 0.18 },
-  { category: 'Λουλούδια & Διακόσμηση', amount: 0.12 },
-  { category: 'Μουσική & DJ', amount: 0.08 },
-  { category: 'Τροφή & Ποτά', amount: 0.05 }
-];
-
 export function ReservationDetail({ reservationId, initialReservation, onBack }: ReservationDetailProps) {
   const { token } = useAuth();
   const [reservation, setReservation] = useState<WeddingReservation | null>(null);
@@ -89,7 +82,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
   const [showGuestsModal, setShowGuestsModal] = useState(false);
   const [showEditReservationModal, setShowEditReservationModal] = useState(false);
   const [editStatus, setEditStatus] = useState<EditStatusUi>('pending');
-  const [editEventYmd, setEditEventYmd] = useState('');
+  const [editEventDate, setEditEventDate] = useState(() => new Date());
   const [editDetails, setEditDetails] = useState('');
   const [editBudget, setEditBudget] = useState('');
   const [editSaving, setEditSaving] = useState(false);
@@ -107,7 +100,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
   useEffect(() => {
     if (!showEditReservationModal || !reservation) return;
     setEditStatus(mapReservationStatusToUi(reservation.status));
-    setEditEventYmd(reservation.wedding_date);
+    setEditEventDate(ymdStringToLocalDate(reservation.wedding_date));
     setEditDetails(reservation.notes || '');
     setEditBudget(reservation.budget > 0 ? String(reservation.budget) : '');
     setEditError(null);
@@ -118,9 +111,9 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
       setEditError('Απαιτείται σύνδεση για αποθήκευση.');
       return;
     }
-    const eventIso = ymdToIsoDateTime(editEventYmd);
+    const eventIso = ymdToIsoDateTime(toLocalYmd(editEventDate));
     if (!eventIso) {
-      setEditError('Η ημερομηνία πρέπει να είναι σε μορφή ΕΕΕΕ-ΜΜ-ΗΗ (π.χ. 2026-03-31).');
+      setEditError('Μη έγκυρη ημερομηνία εκδήλωσης.');
       return;
     }
     let budgetPayload: number | string | null = null;
@@ -266,7 +259,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
           <View className="px-6 py-6 gap-6">
             <View className="flex-row flex-wrap gap-6">
               <View className="flex-1 min-w-[200px] gap-4">
-                <View className="flex-row gap-3">
+                <View className="flex-row gap-3 items-start">
                   <View className="p-2 bg-wed-accent-lighter rounded-lg">
                     <CalendarIcon size={20} color="#C28B84" />
                   </View>
@@ -275,7 +268,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                     <Text className="font-semibold text-gray-900">{formatDate(reservation.wedding_date)}</Text>
                   </View>
                 </View>
-                <View className="flex-row gap-3">
+                <View className="flex-row gap-3 items-start">
                   <View className="p-2 bg-wed-accent-lighter rounded-lg">
                     <MapPin size={20} color="#C28B84" />
                   </View>
@@ -284,7 +277,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                     <Text className="font-semibold text-gray-900">{reservation.venue}</Text>
                   </View>
                 </View>
-                <Pressable onPress={() => setShowGuestsModal(true)} className="flex-row gap-3">
+                <Pressable onPress={() => setShowGuestsModal(true)} className="flex-row gap-3 items-start">
                   <View className="p-2 bg-wed-accent-lighter rounded-lg">
                     <Users size={20} color="#C28B84" />
                   </View>
@@ -293,20 +286,20 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                     <Text className="font-semibold text-gray-900">{reservation.guest_count}</Text>
                   </View>
                 </Pressable>
-                {reservation.package_type && (
-                  <View className="flex-row gap-3">
+                {reservation.package_type ? (
+                  <View className="flex-row gap-3 items-start">
                     <View className="p-2 bg-wed-accent-lighter rounded-lg">
                       <Package size={20} color="#C28B84" />
                     </View>
                     <View>
-                      <Text className="text-sm text-gray-500">Πακέτο</Text>
+                      <Text className="text-sm text-gray-500">Τύπος εκδήλωσης</Text>
                       <Text className="font-semibold text-gray-900">{reservation.package_type}</Text>
                     </View>
                   </View>
-                )}
+                ) : null}
               </View>
               <View className="flex-1 min-w-[200px] gap-4">
-                <View className="flex-row gap-3">
+                <View className="flex-row gap-3 items-start">
                   <View className="p-2 bg-wed-accent-lighter rounded-lg">
                     <Mail size={20} color="#C28B84" />
                   </View>
@@ -316,7 +309,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                   </View>
                 </View>
                 {reservation.contact_phone && (
-                  <View className="flex-row gap-3">
+                  <View className="flex-row gap-3 items-start">
                     <View className="p-2 bg-wed-accent-lighter rounded-lg">
                       <Phone size={20} color="#C28B84" />
                     </View>
@@ -327,7 +320,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                   </View>
                 )}
                 {reservation.budget > 0 && (
-                  <Pressable onPress={() => setShowBudgetAnalysis(true)} className="flex-row gap-3">
+                  <Pressable onPress={() => setShowBudgetAnalysis(true)} className="flex-row gap-3 items-start">
                     <View className="p-2 bg-wed-accent-lighter rounded-lg">
                       <DollarSign size={20} color="#C28B84" />
                     </View>
@@ -337,7 +330,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                     </View>
                   </Pressable>
                 )}
-                <View className="flex-row gap-3">
+                <View className="flex-row gap-3 items-start">
                   <View className="p-2 bg-wed-accent-lighter rounded-lg">
                     <Clock size={20} color="#C28B84" />
                   </View>
@@ -348,9 +341,22 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                 </View>
               </View>
             </View>
+            {reservation.interested_dates ? (
+              <View className="pt-6 border-t border-gray-200">
+                <View className="flex-row gap-3 items-start">
+                  <View className="p-2 bg-wed-accent-lighter rounded-lg">
+                    <CalendarIcon size={20} color="#C28B84" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-sm text-gray-500 mb-2">Προτεινόμενες Ημερομηνίες</Text>
+                    <InterestedDatesDisplay value={reservation.interested_dates} />
+                  </View>
+                </View>
+              </View>
+            ) : null}
             {reservation.notes && (
               <View className="pt-6 border-t border-gray-200">
-                <View className="flex-row gap-3">
+                <View className="flex-row gap-3 items-start">
                   <View className="p-2 bg-wed-accent-lighter rounded-lg">
                     <FileText size={20} color="#C28B84" />
                   </View>
@@ -361,6 +367,19 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                 </View>
               </View>
             )}
+            {reservation.other_comments ? (
+              <View className="pt-6 border-t border-gray-200">
+                <View className="flex-row gap-3 items-start">
+                  <View className="p-2 bg-wed-accent-lighter rounded-lg">
+                    <FileText size={20} color="#C28B84" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-sm text-gray-500 mb-2">Επιπλέον σχόλια</Text>
+                    <Text className="text-gray-700">{reservation.other_comments}</Text>
+                  </View>
+                </View>
+              </View>
+            ) : null}
           </View>
         </View>
       </View>
@@ -371,32 +390,15 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
           <Pressable onPress={(e) => e.stopPropagation()} className="bg-white rounded-xl p-6 max-w-lg mx-auto">
             <View className="flex-row justify-between items-center mb-6 pb-4 border-b border-gray-200">
               <View className="flex-row items-center gap-2">
-                <PieChart size={24} color="#2d2d2d" />
-                <Text className="text-xl font-semibold">Ανάλυση Προϋπολογισμού</Text>
+                <DollarSign size={24} color="#2d2d2d" />
+                <Text className="text-xl font-semibold">Προϋπολογισμός</Text>
               </View>
               <Pressable onPress={() => setShowBudgetAnalysis(false)}>
                 <X size={24} color="#6b7280" />
               </Pressable>
             </View>
             <Text className="text-sm text-gray-500 mb-1">Συνολικός προϋπολογισμός</Text>
-            <Text className="text-2xl font-bold text-gray-900 mb-6">${reservation.budget.toLocaleString()}</Text>
-            <View className="gap-4">
-              {MOCK_BUDGET_BREAKDOWN.map((item) => {
-                const amount = Math.round(reservation.budget * item.amount);
-                const percent = Math.round(item.amount * 100);
-                return (
-                  <View key={item.category} className="gap-2">
-                    <View className="flex-row justify-between">
-                      <Text className="font-medium text-gray-900">{item.category}</Text>
-                      <Text className="text-gray-600">${amount.toLocaleString()} ({percent}%)</Text>
-                    </View>
-                    <View className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <View className="h-full bg-wed-accent rounded-full" style={{ width: `${percent}%` }} />
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
+            <Text className="text-2xl font-bold text-gray-900">${reservation.budget.toLocaleString()}</Text>
           </Pressable>
         </Pressable>
       </Modal>
@@ -476,16 +478,10 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
               </View>
 
               <Text className="text-sm font-medium text-gray-700 mb-1">Ημερομηνία εκδήλωσης</Text>
-              <Text className="text-xs text-gray-500 mb-2">ΕΕΕΕ-ΜΜ-ΗΗ (π.χ. 2026-03-31)</Text>
-              <TextInput
-                value={editEventYmd}
-                onChangeText={setEditEventYmd}
-                placeholder="2026-03-31"
-                autoCapitalize="none"
-                autoCorrect={false}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg mb-4 text-gray-900"
-                placeholderTextColor="#9ca3af"
-              />
+              <Text className="text-xs text-gray-500 mb-2">Επιλέξτε από το ημερολόγιο</Text>
+              <View className="mb-4">
+                <EventDatePickerField value={editEventDate} onChange={setEditEventDate} />
+              </View>
 
               <Text className="text-sm font-medium text-gray-700 mb-1">Λεπτομέρειες</Text>
               <TextInput

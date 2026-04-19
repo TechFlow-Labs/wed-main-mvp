@@ -26,7 +26,8 @@
     "plugins": [
       "expo-router",
       "expo-image-picker",
-      "expo-font"
+      "expo-font",
+      "@react-native-community/datetimepicker"
     ],
     "scheme": "wed-main-mvp"
   }

@@ -26,6 +26,7 @@ import { getPendingReservations, patchReservation } from '../../lib/reservations
 import type { ReservationsSchema } from '../../lib/reservationTypes';
 import { apiReservationToWeddingReservation, eventDateToYmd } from '../../lib/reservationMappers';
 import type { WeddingReservation } from '../../lib/database.types';
+import { InterestedDatesDisplay } from '../InterestedDatesDisplay';
 
 interface EventRequestsProps {
   onBack: () => void;
@@ -66,6 +67,11 @@ function formatEventDateDisplay(iso: string | null | undefined): string {
 
 function sortKeyEvent(iso: string | null | undefined): string {
   return eventDateToYmd(iso) ?? '';
+}
+
+function displayGuestHeadcount(r: ReservationsSchema): number {
+  if (typeof r.guest_count === 'number' && r.guest_count >= 0) return r.guest_count;
+  return Array.isArray(r.guests) ? r.guests.length : 0;
 }
 
 export function EventRequests({ onBack, onCreateReservation }: EventRequestsProps) {
@@ -247,7 +253,7 @@ export function EventRequests({ onBack, onCreateReservation }: EventRequestsProp
           <View className="gap-4">
             {filteredRequests.map((request) => {
               const st = uiStatus(request.status);
-              const guestCount = Array.isArray(request.guests) ? request.guests.length : 0;
+              const guestCount = displayGuestHeadcount(request);
 
               return (
                 <View key={request.id} className="bg-white rounded-lg shadow-md p-6 border border-gray-100">
@@ -273,6 +279,23 @@ export function EventRequests({ onBack, onCreateReservation }: EventRequestsProp
                           <Users size={16} color="#9ca3af" />
                           <Text className="text-sm text-gray-600">{guestCount} προσκεκλημένοι</Text>
                         </View>
+                        {request.event_type ? (
+                          <View className="flex-row items-center gap-2 flex-wrap">
+                            <Text className="text-xs font-medium text-gray-500 uppercase">Τυπος εκδηλωσης</Text>
+                            <View className="bg-wed-accent-lighter px-2 py-0.5 rounded">
+                              <Text className="text-xs text-gray-800">{request.event_type}</Text>
+                            </View>
+                          </View>
+                        ) : null}
+                        {request.interested_dates ? (
+                          <View className="flex-row items-start gap-2">
+                            <CalendarIcon size={16} color="#9ca3af" style={{ marginTop: 2 }} />
+                            <View className="flex-1">
+                              <Text className="text-xs font-medium text-gray-500 mb-1">Προτεινόμενες Ημερομηνίες</Text>
+                              <InterestedDatesDisplay value={request.interested_dates} />
+                            </View>
+                          </View>
+                        ) : null}
                         {request.guest_email ? (
                           <Pressable
                             onPress={() => Linking.openURL(`mailto:${request.guest_email}`)}
@@ -339,6 +362,12 @@ export function EventRequests({ onBack, onCreateReservation }: EventRequestsProp
                         ) : (
                           <Text className="text-sm text-gray-600">{request.details || '—'}</Text>
                         )}
+                        {request.other_comments ? (
+                          <View className="mt-3 pt-3 border-t border-gray-100">
+                            <Text className="text-xs font-medium text-gray-500 mb-1">Επιπλέον σχόλια</Text>
+                            <Text className="text-sm text-gray-600">{request.other_comments}</Text>
+                          </View>
+                        ) : null}
                       </View>
                     </View>
 

@@ -34,6 +34,10 @@ export function AddReservationModal({
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [details, setDetails] = useState('');
+  const [interestedDates, setInterestedDates] = useState('');
+  const [guestCount, setGuestCount] = useState('');
+  const [eventType, setEventType] = useState('');
+  const [otherComments, setOtherComments] = useState('');
   const [budget, setBudget] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +49,10 @@ export function AddReservationModal({
     setGuestEmail('');
     setGuestPhone('');
     setDetails('');
+    setInterestedDates('');
+    setGuestCount('');
+    setEventType('');
+    setOtherComments('');
     setBudget('');
     setError(null);
   }, [visible, selectedDate]);
@@ -66,6 +74,16 @@ export function AddReservationModal({
       budgetVal = Number.isFinite(n) ? n : budget.trim();
     }
 
+    let guestCountVal: number | null = null;
+    if (guestCount.trim()) {
+      const n = parseInt(guestCount.trim(), 10);
+      if (!Number.isFinite(n) || n < 0) {
+        setError('Μη έγκυρος αριθμός προσκεκλημένων.');
+        return;
+      }
+      guestCountVal = n;
+    }
+
     const payload: ReservationAcceptedCreate = {
       guest_first_name: guestFirstName.trim(),
       guest_last_name: guestLastName.trim(),
@@ -74,6 +92,10 @@ export function AddReservationModal({
       event_date: localCalendarDateToEventIso(selectedDate),
       details: details.trim() || null,
       budget_per_reservation: budgetVal,
+      interested_dates: interestedDates.trim() || null,
+      guest_count: guestCountVal,
+      event_type: eventType.trim() || null,
+      other_comments: otherComments.trim() || null,
     };
 
     setSubmitting(true);
@@ -191,6 +213,63 @@ export function AddReservationModal({
                     textAlignVertical="top"
                     value={details}
                     onChangeText={setDetails}
+                    editable={!submitting}
+                    style={inputOutline}
+                    caretColor="#C28B84"
+                  />
+                </View>
+                <View>
+                  <Text className="text-xs font-semibold text-gray-600 mb-1.5">Προτεινόμενες Ημερομηνίες</Text>
+                  <TextInput
+                    className="border border-wed-accent-light rounded-xl px-4 py-3 bg-white text-wed-primary outline-none min-h-[72px]"
+                    placeholder="Προαιρετικό (π.χ. εναλλακτικές ημερομηνίες)"
+                    placeholderTextColor="#9ca3af"
+                    multiline
+                    textAlignVertical="top"
+                    value={interestedDates}
+                    onChangeText={setInterestedDates}
+                    editable={!submitting}
+                    style={inputOutline}
+                    caretColor="#C28B84"
+                  />
+                </View>
+                <View>
+                  <Text className="text-xs font-semibold text-gray-600 mb-1.5">Αριθμός προσκεκλημένων</Text>
+                  <TextInput
+                    className="border border-wed-accent-light rounded-xl px-4 py-3 bg-white text-wed-primary outline-none"
+                    placeholder="Προαιρετικό"
+                    placeholderTextColor="#9ca3af"
+                    keyboardType="number-pad"
+                    value={guestCount}
+                    onChangeText={setGuestCount}
+                    editable={!submitting}
+                    style={inputOutline}
+                    caretColor="#C28B84"
+                  />
+                </View>
+                <View>
+                  <Text className="text-xs font-semibold text-gray-600 mb-1.5">Τύπος εκδήλωσης</Text>
+                  <TextInput
+                    className="border border-wed-accent-light rounded-xl px-4 py-3 bg-white text-wed-primary outline-none"
+                    placeholder="Προαιρετικό"
+                    placeholderTextColor="#9ca3af"
+                    value={eventType}
+                    onChangeText={setEventType}
+                    editable={!submitting}
+                    style={inputOutline}
+                    caretColor="#C28B84"
+                  />
+                </View>
+                <View>
+                  <Text className="text-xs font-semibold text-gray-600 mb-1.5">Επιπλέον σχόλια</Text>
+                  <TextInput
+                    className="border border-wed-accent-light rounded-xl px-4 py-3 bg-white text-wed-primary outline-none min-h-[72px]"
+                    placeholder="Προαιρετικό"
+                    placeholderTextColor="#9ca3af"
+                    multiline
+                    textAlignVertical="top"
+                    value={otherComments}
+                    onChangeText={setOtherComments}
                     editable={!submitting}
                     style={inputOutline}
                     caretColor="#C28B84"

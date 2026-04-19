@@ -99,5 +99,9 @@ export interface Database {
   };
 }
 
-export type WeddingReservation = Database['public']['Tables']['wedding_reservations']['Row'];
+/** Local Supabase row plus optional fields returned from the FastAPI `ReservationsSchema` / `ReservationsItemSchema`. */
+export type WeddingReservation = Database['public']['Tables']['wedding_reservations']['Row'] & {
+  interested_dates?: string | null;
+  other_comments?: string | null;
+};
 export type EventSpaceRequest = Database['public']['Tables']['event_space_requests']['Row'];
