@@ -6,17 +6,19 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-# Web bundle uses same-origin /api so Nginx can proxy to the API (no browser CORS to :8060).
+# Web bundle uses same-origin /api so Traefik routes API traffic to backend (no browser CORS to host ports).
 ARG EXPO_PUBLIC_API_URL=/api
 ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
 RUN npm run build:web
 
-FROM nginx:1.27-alpine
+FROM node:20-alpine
 
-COPY docker/nginx.http.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/dist/ /usr/share/nginx/html/
+WORKDIR /app
+RUN npm install -g serve@14.2.4
 
-# COPY can preserve tight perms from host; nginx runs as non-root.
-RUN chmod -R a+rX /usr/share/nginx/html
+COPY --from=builder /app/dist ./dist
+RUN chmod -R a+rX /app/dist
 
-EXPOSE 80
+EXPOSE 8080
+
+CMD ["serve", "-s", "dist", "-l", "8080"]
