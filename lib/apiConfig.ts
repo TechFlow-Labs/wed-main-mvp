@@ -5,8 +5,6 @@
  * - Override anytime with EXPO_PUBLIC_API_URL.
  */
 export function getApiBaseUrl(): string {
-  const fallback =
-    process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:8060';
-  const raw = process.env.EXPO_PUBLIC_API_URL ?? fallback;
+  const raw = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8060';
   return raw.replace(/\/$/, '');
 }
