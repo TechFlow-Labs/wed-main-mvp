@@ -1,23 +1,31 @@
+# Coolify deployment for wed-main-mvp (Expo Web / React Native for Web)
+# Set the following in Coolify environment variables (build args):
+#   EXPO_PUBLIC_API_URL          - backend API URL baked into the JS bundle
+#   EXPO_PUBLIC_SUPABASE_URL     - Supabase project URL
+#   EXPO_PUBLIC_SUPABASE_ANON_KEY - Supabase anon/public key
+#
+# These are COMPILE-TIME values — changing them requires a new build/deploy.
+# Coolify generates SERVICE_FQDN_WEB_80 from the FQDN you set in the UI.
+
 services:
   web:
-    build: .
-    image: wedding-reservations-web:latest
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-www:/var/www/certbot
-    restart: unless-stopped
+    build:
+      context: .
+      args:
+        EXPO_PUBLIC_API_URL: ${EXPO_PUBLIC_API_URL}
+        EXPO_PUBLIC_SUPABASE_URL: ${EXPO_PUBLIC_SUPABASE_URL}
+        EXPO_PUBLIC_SUPABASE_ANON_KEY: ${EXPO_PUBLIC_SUPABASE_ANON_KEY}
+    networks:
+      - coolify
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.wed-main.rule=Host(`${SERVICE_FQDN_WEB_80}`)"
+      - traefik.http.routers.wed-main.entrypoints=https
+      - traefik.http.routers.wed-main.tls=true
+      - traefik.http.routers.wed-main.tls.certresolver=letsencrypt
+      - traefik.http.services.wed-main.loadbalancer.server.port=80
 
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - certbot-www:/var/www/certbot
-
-volumes:
-  certbot-etc:
-  certbot-var:
-  certbot-www:
+networks:
+  coolify:
+    external: true
+    name: coolify
