@@ -36,7 +36,6 @@ jobs:
         run: |
           APP_NAME="${{ steps.slug.outputs.app_name }}"
 
-          # Try to find existing app
           RESPONSE=$(curl -sf \
             -H "Authorization: Bearer $COOLIFY_API_TOKEN" \
             "$COOLIFY_URL/api/v1/applications" || echo '{}')
@@ -45,7 +44,7 @@ jobs:
 
           if [ -z "$UUID" ]; then
             echo "Creating new Coolify app: $APP_NAME"
-            CREATE=$(curl -sf -X POST \
+            CREATE=$(curl -s -X POST \
               -H "Authorization: Bearer $COOLIFY_API_TOKEN" \
               -H "Content-Type: application/json" \
               -d "$(jq -n \
@@ -70,7 +69,12 @@ jobs:
                   instant_deploy: false
                 }')" \
               "$COOLIFY_URL/api/v1/applications/github-app")
-            UUID=$(echo "$CREATE" | jq -r '.uuid')
+            echo "Coolify response: $CREATE"
+            UUID=$(echo "$CREATE" | jq -r '.uuid // empty')
+            if [ -z "$UUID" ] || [ "$UUID" = "null" ]; then
+              echo "ERROR: Failed to create Coolify app"
+              exit 1
+            fi
             echo "Created app with UUID: $UUID"
           else
             echo "Found existing app with UUID: $UUID"
