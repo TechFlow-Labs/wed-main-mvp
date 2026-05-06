@@ -50,7 +50,7 @@ jobs:
               -d "$(jq -n \
                 --arg project_uuid "${{ secrets.COOLIFY_PROJECT_UUID }}" \
                 --arg server_uuid "${{ secrets.COOLIFY_SERVER_UUID }}" \
-                --arg github_app_uuid "${{ secrets.COOLIFY_GITHUB_APP_UUID }}" \
+                --argjson source_id 4 \
                 --arg branch "$GITHUB_REF_NAME" \
                 --arg name "$APP_NAME" \
                 --arg fqdn "${{ steps.slug.outputs.fqdn }}" \
@@ -58,8 +58,9 @@ jobs:
                   project_uuid: $project_uuid,
                   server_uuid: $server_uuid,
                   environment_name: "preview",
-                  github_app_uuid: $github_app_uuid,
-                  git_repository: "techflow-labs/wed-main-mvp",
+                  source_id: $source_id,
+                  source_type: "App\\Models\\GithubApp",
+                  git_repository: "TechFlow-Labs/wed-main-mvp",
                   git_branch: $branch,
                   build_pack: "dockerfile",
                   dockerfile_location: "/Dockerfile.preview",
@@ -68,7 +69,7 @@ jobs:
                   fqdn: $fqdn,
                   instant_deploy: false
                 }')" \
-              "$COOLIFY_URL/api/v1/applications/github-app")
+              "$COOLIFY_URL/api/v1/applications")
             echo "Coolify response: $CREATE"
             UUID=$(echo "$CREATE" | jq -r '.uuid // empty')
             if [ -z "$UUID" ] || [ "$UUID" = "null" ]; then
