@@ -94,7 +94,7 @@ Each preview URL can then route frontend and API through the same origin while N
 
 ### Notes
 
-- Coolify handles TLS/ingress for preview/main domains, so this app only serves plain HTTP on port `80`.
+- Coolify handles TLS/ingress for preview/main domains, so this app serves plain HTTP on port `85`.
 - `docker-compose.yml` remains for local development only.
 
 ## Project structure

@@ -23,4 +23,4 @@ COPY --from=builder /app/dist/ /usr/share/nginx/html/
 # COPY can preserve tight perms from host; nginx runs as non-root.
 RUN chmod -R a+rX /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 85
