@@ -13,7 +13,11 @@ RUN npm run build:web
 
 FROM nginx:1.27-alpine
 
-COPY docker/nginx.http.conf /etc/nginx/conf.d/default.conf
+ENV APP_DOMAIN=_
+ENV API_UPSTREAM=http://host.docker.internal:8060
+
+# Official nginx entrypoint expands /etc/nginx/templates/*.template with envsubst.
+COPY docker/nginx.http.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/dist/ /usr/share/nginx/html/
 
 # COPY can preserve tight perms from host; nginx runs as non-root.

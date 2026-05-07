@@ -1,5 +1,6 @@
 services:
   web:
+    # Local development helper. Coolify deployments should use Dockerfile directly.
     build: .
     image: wedding-reservations-web:latest
     hostname: wedmainapp

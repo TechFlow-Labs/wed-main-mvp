@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-DOMAIN="main.wedapp.gr"
+DOMAIN="${APP_DOMAIN:-main.wedapp.gr}"
 HTTPS_CONF="/etc/nginx/docker-templates/https.conf"
 HTTP_CONF="/etc/nginx/docker-templates/http.conf"
 TARGET="/etc/nginx/conf.d/default.conf"
