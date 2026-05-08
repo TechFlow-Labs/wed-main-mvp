@@ -1,44 +1,60 @@
 # Διαχείριση Κρατήσεων Γάμων (Expo)
 
-Expo version of the Wedding Reservations app—runs on **web**, **iOS**, and **Android**.
+Expo version of the Wedding Reservations app. Runs on **web**, **iOS**, and **Android**.
 
 ## Setup
 
-1. **Install dependencies** (if you get npm cache errors, run `sudo chown -R $(whoami) ~/.npm` first):
+1. Install dependencies:
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-2. **Configure environment**  
-   Ensure `.env` contains:
+2. Configure `.env`:
 
-   ```
-   EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
+```env
+EXPO_PUBLIC_API_URL=https://api.yourdomain.com
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-## Run
+Only `EXPO_PUBLIC_*` variables are supported for deployment.
 
-- **Web**: `npm run web` or `npx expo start --web`
-- **iOS**: `npm run ios` or `npx expo start --ios`
-- **Android**: `npm run android` or `npx expo start --android`
-- **All platforms**: `npm start` then press `w` for web, `i` for iOS, `a` for Android
+## Local run
 
-## Project structure
+- Web dev server: `npm run web`
+- iOS: `npm run ios`
+- Android: `npm run android`
+- Web export build: `npm run build:web`
+- Serve exported build locally: `npm run serve:web`
 
-- `app/` – Expo Router routes (layout, index)
-- `components/` – Shared UI (Navbar, Calendar, ReservationsList, App)
-- `components/pages/` – Dashboard, Profile, EventRequests, ReservationDetail
-- `lib/` – Supabase client, database types, profile types
-- `supabase/` – Migrations (unchanged from original)
+## Docker runtime (no Nginx)
 
-## Differences from original Vite app
+The Docker image:
+1. Builds static web assets with `expo export --platform web`.
+2. Serves `dist/` with Node `serve` on port `3000`.
 
-- React Native primitives (`View`, `Text`, `Pressable`, `TextInput`, etc.) instead of HTML
-- NativeWind (Tailwind for React Native) for styling
-- `lucide-react-native` instead of `lucide-react`
-- AsyncStorage instead of `localStorage`
-- `expo-image-picker` for image selection
-- `Linking.openURL()` for `mailto:`, `tel:`, and calendar links
-- Print only on web (via `window.print()`)
+Container ingress, TLS certificates, and HTTP->HTTPS redirects are expected to be handled by Traefik/Coolify.
+
+## Coolify (Traefik-only) configuration
+
+Create a single **Application** in Coolify from this repository:
+- Build Pack: `Dockerfile`
+- Dockerfile path: `./Dockerfile`
+- Container port: `3000`
+- Domain: `app.yourdomain.com`
+- Enable automatic HTTPS (Let's Encrypt)
+- Enable force HTTPS redirect
+- Health check path: `/`
+
+Set these environment variables in Coolify:
+
+```env
+EXPO_PUBLIC_API_URL=https://api.yourdomain.com
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+## Note about legacy Vite files
+
+The `src/` directory contains legacy Vite-era files that use `VITE_*` env names and is not part of the Expo deployment path. Production deployment for this project uses the Expo app and `EXPO_PUBLIC_*` variables only.

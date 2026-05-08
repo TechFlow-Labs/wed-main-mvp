@@ -1,11 +1,18 @@
-FROM nginx:1.27-alpine
+FROM node:20-alpine AS builder
 
-COPY docker/nginx.http.conf /etc/nginx/docker-templates/http.conf
-COPY docker/nginx.https.conf /etc/nginx/docker-templates/https.conf
-COPY docker/docker-entrypoint.d/50-choose-nginx-config.sh /docker-entrypoint.d/50-choose-nginx-config.sh
-RUN chmod +x /docker-entrypoint.d/50-choose-nginx-config.sh
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npx expo export --platform web
 
-COPY docker/nginx.http.conf /etc/nginx/conf.d/default.conf
-COPY dist/ /usr/share/nginx/html/
+FROM node:20-alpine AS runner
 
-EXPOSE 80 443
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+RUN npm install --global serve@14.2.4
+
+ENV NODE_ENV=production
+EXPOSE 3000
+
+CMD ["serve", "-s", "dist", "-l", "3000"]
