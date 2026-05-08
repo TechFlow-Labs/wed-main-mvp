@@ -29,7 +29,6 @@ import {
   CalendarPlus,
   Download
 } from 'lucide-react-native';
-import { supabase } from '../../lib/supabase';
 import type { WeddingReservation } from '../../lib/database.types';
 import { GuestsModal } from '../GuestsModal';
 import { useAuth } from '../../contexts/AuthContext';
@@ -67,7 +66,7 @@ const STATUS_OPTIONS: { value: EditStatusUi; label: string }[] = [
 
 interface ReservationDetailProps {
   reservationId: string;
-  /** When set (e.g. from API list), skips Supabase fetch for this id */
+  /** Reservation payload from API list/detail endpoints. */
   initialReservation?: WeddingReservation | null;
   onBack: () => void;
 }
@@ -101,7 +100,8 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
       setLoading(false);
       return;
     }
-    loadReservation();
+    setReservation(null);
+    setLoading(false);
   }, [reservationId, initialReservation]);
 
   useEffect(() => {
@@ -148,23 +148,6 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
       setEditError(e instanceof Error ? e.message : 'Αποτυχία αποθήκευσης');
     } finally {
       setEditSaving(false);
-    }
-  };
-
-  const loadReservation = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('wedding_reservations')
-        .select('*')
-        .eq('id', reservationId)
-        .maybeSingle();
-      if (error) throw error;
-      setReservation(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 

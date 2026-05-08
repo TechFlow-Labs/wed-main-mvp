@@ -14,8 +14,6 @@ npm install
 
 ```env
 EXPO_PUBLIC_API_URL=https://api.yourdomain.com
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 Only `EXPO_PUBLIC_*` variables are supported for deployment.
@@ -51,8 +49,6 @@ Set these environment variables in Coolify:
 
 ```env
 EXPO_PUBLIC_API_URL=https://api.yourdomain.com
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ## Note about legacy Vite files
