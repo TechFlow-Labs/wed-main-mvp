@@ -1,19 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
-import { LayoutDashboard, User, ChevronDown, Inbox } from 'lucide-react';
+import { LayoutDashboard, User, ChevronDown, Inbox, Gift } from 'lucide-react';
 import { getAdminProfile } from '../lib/profile.types';
 
 interface NavbarProps {
   onNavigateToDashboard?: () => void;
   onNavigateToProfile?: () => void;
   onNavigateToEventRequests?: () => void;
+  onNavigateToGiftLists?: () => void;
   showBackToDashboard?: boolean;
-  currentPage?: 'dashboard' | 'detail' | 'profile' | 'event-requests';
+  currentPage?: 'dashboard' | 'detail' | 'profile' | 'event-requests' | 'gift-lists';
 }
 
 export function Navbar({
   onNavigateToDashboard,
   onNavigateToProfile,
   onNavigateToEventRequests,
+  onNavigateToGiftLists,
   showBackToDashboard = false,
   currentPage = 'dashboard'
 }: NavbarProps) {
@@ -64,6 +66,19 @@ export function Navbar({
                 >
                   <Inbox className="w-4 h-4" />
                   Αιτήματα Χώρου
+                </button>
+              )}
+              {onNavigateToGiftLists && (
+                <button
+                  onClick={onNavigateToGiftLists}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                    currentPage === 'gift-lists'
+                      ? 'text-wed-primary font-semibold'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Gift className="w-4 h-4" />
+                  Gift Lists
                 </button>
               )}
             </div>

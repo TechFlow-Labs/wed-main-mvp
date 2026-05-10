@@ -4,12 +4,14 @@ import { Dashboard } from './pages/Dashboard';
 import { ReservationDetail } from './pages/ReservationDetail';
 import { Profile } from './pages/Profile';
 import { EventRequests } from './pages/EventRequests';
+import { GiftLists } from './pages/GiftLists';
 
 type View =
   | { type: 'dashboard' }
   | { type: 'detail'; reservationId: string }
   | { type: 'profile' }
-  | { type: 'event-requests' };
+  | { type: 'event-requests' }
+  | { type: 'gift-lists' };
 
 function App() {
   const [currentView, setCurrentView] = useState<View>({ type: 'dashboard' });
@@ -34,10 +36,15 @@ function App() {
     setCurrentView({ type: 'event-requests' });
   };
 
+  const handleNavigateToGiftLists = () => {
+    setCurrentView({ type: 'gift-lists' });
+  };
+
   const showBackToDashboard =
     currentView.type === 'detail' ||
     currentView.type === 'profile' ||
-    currentView.type === 'event-requests';
+    currentView.type === 'event-requests' ||
+    currentView.type === 'gift-lists';
 
   return (
     <div className="min-h-screen">
@@ -45,6 +52,7 @@ function App() {
         onNavigateToDashboard={handleNavigateToDashboard}
         onNavigateToProfile={handleNavigateToProfile}
         onNavigateToEventRequests={handleNavigateToEventRequests}
+        onNavigateToGiftLists={handleNavigateToGiftLists}
         showBackToDashboard={showBackToDashboard}
         currentPage={
           currentView.type === 'detail'
@@ -53,6 +61,8 @@ function App() {
             ? 'profile'
             : currentView.type === 'event-requests'
             ? 'event-requests'
+            : currentView.type === 'gift-lists'
+            ? 'gift-lists'
             : 'dashboard'
         }
       />
@@ -68,6 +78,7 @@ function App() {
           onBack={handleBack}
         />
       )}
+      {currentView.type === 'gift-lists' && <GiftLists />}
       {currentView.type === 'dashboard' && (
         <Dashboard onSelectReservation={handleSelectReservation} />
       )}
