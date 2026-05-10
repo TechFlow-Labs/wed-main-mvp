@@ -57,3 +57,5 @@ Expo version of the Wedding Reservations app—runs on **web**, **iOS**, and **A
   - `npm run web` και έλεγχος της οθόνης μέσα από το app navigation.
 - Expected PR preview URL:
   - `https://main-feature-special-partners-page.preview.techflowlabs.gr`
+
+- Chore: documentation note added for branch-aligned preview deploy checks.
