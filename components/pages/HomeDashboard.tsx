@@ -1,11 +1,12 @@
 import { View, Text, ScrollView, Pressable } from 'react-native';
-import { CalendarDays, Inbox, Sparkles, Wallet, StickyNote } from 'lucide-react-native';
+import { CalendarDays, Inbox, Sparkles, Wallet, StickyNote, Star } from 'lucide-react-native';
 
 type HomeDashboardProps = {
   onNavigateToReservations: () => void;
   onNavigateToRequests: () => void;
   onNavigateToPartnerExpenses: () => void;
   onNavigateToNotes: () => void;
+  onNavigateToSpecialPartners: () => void;
 };
 
 export function HomeDashboard({
@@ -13,6 +14,7 @@ export function HomeDashboard({
   onNavigateToRequests,
   onNavigateToPartnerExpenses,
   onNavigateToNotes,
+  onNavigateToSpecialPartners,
 }: HomeDashboardProps) {
   return (
     <ScrollView className="flex-1 bg-wed-bg">
@@ -30,7 +32,7 @@ export function HomeDashboard({
           </View>
           <Text className="text-3xl font-light text-wed-primary text-center">Καλώς ήρθατε</Text>
           <Text className="text-gray-600 text-center mt-3 px-2 leading-6">
-            Επιλέξτε πού θέλετε να μεταβείτε — κρατήσεις, αιτήματα, έξοδα ή σημειώσεις.
+            Επιλέξτε πού θέλετε να μεταβείτε — κρατήσεις, αιτήματα, έξοδα, σημειώσεις ή special partners.
           </Text>
         </View>
 
@@ -138,6 +140,35 @@ export function HomeDashboard({
                   <Text className="text-xl font-semibold text-wed-primary mb-1">Σημειώσεις</Text>
                   <Text className="text-sm text-gray-600 leading-5">
                     Γενικές σημειώσεις — προσθήκη, επεξεργασία και προαιρετική σύνδεση με κράτηση.
+                  </Text>
+                </View>
+              </View>
+              <View className="mt-4 pt-4 border-t border-gray-100">
+                <Text className="text-sm font-semibold text-wed-accent">Μετάβαση →</Text>
+              </View>
+            </Pressable>
+          </View>
+
+          <View className="flex-col md:flex-row gap-5">
+            <Pressable
+              onPress={onNavigateToSpecialPartners}
+              className="flex-1 min-w-0 bg-white rounded-2xl border border-wed-accent-light/60 p-6 active:opacity-95"
+              style={{
+                shadowColor: '#2d2d2d',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.07,
+                shadowRadius: 20,
+                elevation: 6,
+              }}
+            >
+              <View className="flex-row items-start gap-4">
+                <View className="w-14 h-14 rounded-2xl bg-wed-accent-lighter items-center justify-center border border-wed-accent-light">
+                  <Star size={28} color="#C28B84" />
+                </View>
+                <View className="flex-1 min-w-0">
+                  <Text className="text-xl font-semibold text-wed-primary mb-1">Special Partners</Text>
+                  <Text className="text-sm text-gray-600 leading-5">
+                    Επιλεγμένοι συνεργάτες με σύντομη περιγραφή, badge, εικόνα και αξιολόγηση.
                   </Text>
                 </View>
               </View>

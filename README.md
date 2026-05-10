@@ -30,6 +30,7 @@ Expo version of the Wedding Reservations app—runs on **web**, **iOS**, and **A
 - `app/` – Expo Router routes (layout, index)
 - `components/` – Shared UI (Navbar, Calendar, ReservationsList, App)
 - `components/pages/` – Dashboard, Profile, EventRequests, ReservationDetail
+- `components/pages/` – Dashboard, Profile, EventRequests, ReservationDetail, SpecialPartners
 - `lib/` – Supabase client, database types, profile types
 - `supabase/` – Migrations (unchanged from original)
 
@@ -42,3 +43,17 @@ Expo version of the Wedding Reservations app—runs on **web**, **iOS**, and **A
 - `expo-image-picker` for image selection
 - `Linking.openURL()` for `mailto:`, `tel:`, and calendar links
 - Print only on web (via `window.print()`)
+
+## Special Partners feature
+
+- Προστέθηκε νέα οθόνη `Special Partners` στο internal navigation flow.
+- Το UI είναι προσβάσιμο από:
+  - navbar item `Special Partners`
+  - home dashboard card `Special Partners`
+- Endpoint contract:
+  - `GET /public-api/special-partners/`
+  - `items: Array<{ id, name, category, city, shortDescription, badge, featuredImage, rating }>`
+- Local test:
+  - `npm run web` και έλεγχος της οθόνης μέσα από το app navigation.
+- Expected PR preview URL:
+  - `https://main-feature-special-partners-page.preview.techflowlabs.gr`

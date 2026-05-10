@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
-import { Home, LayoutDashboard, User, ChevronDown, Inbox, LogOut, Wallet, StickyNote } from 'lucide-react-native';
+import { Home, LayoutDashboard, User, ChevronDown, Inbox, LogOut, Wallet, StickyNote, Star } from 'lucide-react-native';
 import { getAdminProfile, type AdminProfile } from '../lib/profile.types';
 import { useAuth } from '../contexts/AuthContext';
 import { getMyProfile } from '../lib/profileApi';
@@ -23,9 +23,10 @@ interface NavbarProps {
   onNavigateToEventRequests?: () => void;
   onNavigateToPartnerExpenses?: () => void;
   onNavigateToNotes?: () => void;
+  onNavigateToSpecialPartners?: () => void;
   onLogout?: () => void;
   showBackToDashboard?: boolean;
-  currentPage?: 'home' | 'dashboard' | 'detail' | 'profile' | 'event-requests' | 'partner-expenses' | 'notes';
+  currentPage?: 'home' | 'dashboard' | 'detail' | 'profile' | 'event-requests' | 'partner-expenses' | 'notes' | 'special-partners';
 }
 
 type Anchor = { x: number; y: number; width: number; height: number };
@@ -37,6 +38,7 @@ export function Navbar({
   onNavigateToEventRequests,
   onNavigateToPartnerExpenses,
   onNavigateToNotes,
+  onNavigateToSpecialPartners,
   onLogout,
   showBackToDashboard: _showBackToDashboard = false,
   currentPage = 'home'
@@ -158,6 +160,17 @@ export function Navbar({
                 <StickyNote size={16} color={currentPage === 'notes' ? '#2d2d2d' : '#6b7280'} />
                 <Text className={`text-sm font-medium ${currentPage === 'notes' ? 'text-wed-primary font-semibold' : 'text-gray-600'}`}>
                   Σημειώσεις
+                </Text>
+              </Pressable>
+            )}
+            {onNavigateToSpecialPartners && (
+              <Pressable
+                onPress={onNavigateToSpecialPartners}
+                className={`flex-row items-center gap-2 py-2 px-2 ${currentPage === 'special-partners' ? 'opacity-100' : 'opacity-70'}`}
+              >
+                <Star size={16} color={currentPage === 'special-partners' ? '#2d2d2d' : '#6b7280'} />
+                <Text className={`text-sm font-medium ${currentPage === 'special-partners' ? 'text-wed-primary font-semibold' : 'text-gray-600'}`}>
+                  Special Partners
                 </Text>
               </Pressable>
             )}
