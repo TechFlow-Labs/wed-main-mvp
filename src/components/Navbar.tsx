@@ -1,19 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
-import { LayoutDashboard, User, ChevronDown, Inbox } from 'lucide-react';
+import { LayoutDashboard, User, ChevronDown, Inbox, Globe } from 'lucide-react';
 import { getAdminProfile } from '../lib/profile.types';
 
 interface NavbarProps {
   onNavigateToDashboard?: () => void;
   onNavigateToProfile?: () => void;
   onNavigateToEventRequests?: () => void;
+  onNavigateToWebsiteGenerator?: () => void;
   showBackToDashboard?: boolean;
-  currentPage?: 'dashboard' | 'detail' | 'profile' | 'event-requests';
+  currentPage?: 'dashboard' | 'detail' | 'profile' | 'event-requests' | 'website-generator';
 }
 
 export function Navbar({
   onNavigateToDashboard,
   onNavigateToProfile,
   onNavigateToEventRequests,
+  onNavigateToWebsiteGenerator,
   showBackToDashboard = false,
   currentPage = 'dashboard'
 }: NavbarProps) {
@@ -36,34 +38,24 @@ export function Navbar({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold text-gray-900">
-              Wed Partners
-            </h1>
+            <h1 className="text-xl font-bold text-gray-900">Wed Partners</h1>
             <div className="flex items-center gap-2">
               {onNavigateToDashboard && (
-                <button
-                  onClick={onNavigateToDashboard}
-                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                    currentPage === 'dashboard'
-                      ? 'text-wed-primary font-semibold'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
+                <button onClick={onNavigateToDashboard} className={`flex items-center gap-2 text-sm font-medium transition-colors ${currentPage === 'dashboard' ? 'text-wed-primary font-semibold' : 'text-gray-600 hover:text-gray-900'}`}>
                   <LayoutDashboard className="w-4 h-4" />
                   Πίνακας Ελέγχου
                 </button>
               )}
               {onNavigateToEventRequests && (
-                <button
-                  onClick={onNavigateToEventRequests}
-                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                    currentPage === 'event-requests'
-                      ? 'text-wed-primary font-semibold'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
+                <button onClick={onNavigateToEventRequests} className={`flex items-center gap-2 text-sm font-medium transition-colors ${currentPage === 'event-requests' ? 'text-wed-primary font-semibold' : 'text-gray-600 hover:text-gray-900'}`}>
                   <Inbox className="w-4 h-4" />
                   Αιτήματα Χώρου
+                </button>
+              )}
+              {onNavigateToWebsiteGenerator && (
+                <button onClick={onNavigateToWebsiteGenerator} className={`flex items-center gap-2 text-sm font-medium transition-colors ${currentPage === 'website-generator' ? 'text-wed-primary font-semibold' : 'text-gray-600 hover:text-gray-900'}`}>
+                  <Globe className="w-4 h-4" />
+                  Wedding Website
                 </button>
               )}
             </div>
@@ -71,10 +63,7 @@ export function Navbar({
 
           <div className="flex items-center gap-4">
             <div className="relative" ref={menuRef}>
-              <button
-                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-              >
+              <button onClick={() => setProfileMenuOpen(!profileMenuOpen)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
                 <div className="w-8 h-8 rounded-full bg-wed-accent-lighter flex items-center justify-center overflow-hidden shrink-0">
                   {profile.avatarUrl ? (
                     <img src={profile.avatarUrl} alt="" className="w-full h-full object-cover" />
@@ -82,21 +71,15 @@ export function Navbar({
                     <User className="w-4 h-4 text-wed-accent" />
                   )}
                 </div>
-                <span className="hidden sm:inline">
-                  {profile.name || 'Προφίλ'}
-                </span>
+                <span className="hidden sm:inline">{profile.name || 'Προφίλ'}</span>
                 <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {profileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-lg border border-gray-200 py-1">
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {profile.name || 'Διαχειριστής'}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {profile.email || 'Δεν έχει οριστεί email'}
-                    </p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{profile.name || 'Διαχειριστής'}</p>
+                    <p className="text-xs text-gray-500 truncate">{profile.email || 'Δεν έχει οριστεί email'}</p>
                   </div>
                   <button
                     onClick={() => {
