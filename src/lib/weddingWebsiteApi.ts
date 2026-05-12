@@ -1,3 +1,5 @@
+import { getApiBaseUrl, getPublicWebBaseUrl } from "../../lib/apiConfig";
+
 export type WebsiteFaqItem = {
   question: string;
   answer: string;
@@ -27,27 +29,42 @@ export type WeddingWebsiteResponse = WeddingWebsitePayload & {
   updated_at: string;
 };
 
-function normalize(base: string): string {
-  return base.replace(/\/+$/, "");
+function parseApiError(status: number, body: string): string {
+  try {
+    const parsed = JSON.parse(body) as {
+      detail?: string | { msg?: string }[] | { msg?: string };
+    };
+    if (typeof parsed.detail === "string") return parsed.detail;
+    if (Array.isArray(parsed.detail) && parsed.detail[0]?.msg) {
+      return parsed.detail.map((d) => d.msg).join(", ");
+    }
+  } catch {
+    /* ignore */
+  }
+  return `Request failed (${status})`;
 }
 
-export function apiBaseUrl(): string {
-  return normalize(import.meta.env.VITE_API_URL || "http://localhost:8060");
+export function publicWeddingPageUrl(publicPath: string): string | null {
+  const base = getPublicWebBaseUrl();
+  if (!base) return null;
+  const path = publicPath.startsWith("/") ? publicPath : `/${publicPath}`;
+  return `${base}${path}`;
 }
 
 export async function generateWeddingWebsite(
   payload: WeddingWebsitePayload
 ): Promise<WeddingWebsiteResponse> {
-  const res = await fetch(`${apiBaseUrl()}/websites/generate`, {
+  const url = `${getApiBaseUrl()}/websites/generate`;
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
+  const bodyText = await res.text();
   if (!res.ok) {
-    const err = await res.json().catch(() => null);
-    throw new Error(err?.detail || "Failed to generate wedding website");
+    throw new Error(parseApiError(res.status, bodyText));
   }
 
-  return res.json();
+  return JSON.parse(bodyText) as WeddingWebsiteResponse;
 }
