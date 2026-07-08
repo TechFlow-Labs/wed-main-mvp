@@ -9,6 +9,7 @@ import { Profile } from './pages/Profile';
 import { EventRequests } from './pages/EventRequests';
 import { PartnerExpenses } from './pages/PartnerExpenses';
 import { NotesScreen } from './pages/NotesScreen';
+import { BudgetScreen } from './pages/BudgetScreen';
 
 import type { WeddingReservation } from '../lib/database.types';
 
@@ -19,7 +20,8 @@ type ViewState =
   | { type: 'profile' }
   | { type: 'event-requests' }
   | { type: 'partner-expenses' }
-  | { type: 'notes' };
+  | { type: 'notes' }
+  | { type: 'budget' };
 
 export function App() {
   const { logout } = useAuth();
@@ -57,12 +59,17 @@ export function App() {
     setCurrentView({ type: 'notes' });
   };
 
+  const handleNavigateToBudget = () => {
+    setCurrentView({ type: 'budget' });
+  };
+
   const showBackToDashboard =
     currentView.type === 'detail' ||
     currentView.type === 'profile' ||
     currentView.type === 'event-requests' ||
     currentView.type === 'partner-expenses' ||
-    currentView.type === 'notes';
+    currentView.type === 'notes' ||
+    currentView.type === 'budget';
 
   return (
     <View className="flex-1 min-h-screen">
@@ -73,6 +80,7 @@ export function App() {
         onNavigateToEventRequests={handleNavigateToEventRequests}
         onNavigateToPartnerExpenses={handleNavigateToPartnerExpenses}
         onNavigateToNotes={handleNavigateToNotes}
+        onNavigateToBudget={handleNavigateToBudget}
         onLogout={logout}
         showBackToDashboard={showBackToDashboard}
         currentPage={
@@ -86,6 +94,8 @@ export function App() {
             ? 'partner-expenses'
             : currentView.type === 'notes'
             ? 'notes'
+            : currentView.type === 'budget'
+            ? 'budget'
             : currentView.type === 'home'
             ? 'home'
             : 'dashboard'
@@ -99,6 +109,7 @@ export function App() {
       )}
       {currentView.type === 'partner-expenses' && <PartnerExpenses onBack={handleNavigateToHome} />}
       {currentView.type === 'notes' && <NotesScreen onBack={handleNavigateToHome} />}
+      {currentView.type === 'budget' && <BudgetScreen onBack={handleNavigateToHome} />}
       {currentView.type === 'detail' && (
         <ReservationDetail
           reservationId={currentView.reservationId}

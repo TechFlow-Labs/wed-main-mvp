@@ -6,7 +6,6 @@ import {
   Pressable,
   ActivityIndicator,
   Modal,
-  Image,
   Linking,
   Platform,
   TextInput
@@ -29,11 +28,10 @@ import {
   CalendarPlus,
   Download
 } from 'lucide-react-native';
-import { supabase } from '../../lib/supabase';
 import type { WeddingReservation } from '../../lib/database.types';
 import { GuestsModal } from '../GuestsModal';
 import { useAuth } from '../../contexts/AuthContext';
-import { patchReservation } from '../../lib/reservationsApi';
+import { patchReservation, fetchAllReservations } from '../../lib/reservationsApi';
 import { apiReservationToWeddingReservation } from '../../lib/reservationMappers';
 
 type EditStatusUi = 'pending' | 'confirmed' | 'completed' | 'cancelled';
@@ -46,7 +44,6 @@ function mapReservationStatusToUi(status: string): EditStatusUi {
   return 'pending';
 }
 
-/** Values that `patchReservation` + `normalizeStatusForApiPatch` accept */
 function uiStatusToApiPatch(status: EditStatusUi): string {
   if (status === 'cancelled') return 'rejected';
   return status;
@@ -67,7 +64,6 @@ const STATUS_OPTIONS: { value: EditStatusUi; label: string }[] = [
 
 interface ReservationDetailProps {
   reservationId: string;
-  /** When set (e.g. from API list), skips Supabase fetch for this id */
   initialReservation?: WeddingReservation | null;
   onBack: () => void;
 }
@@ -152,15 +148,15 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
   };
 
   const loadReservation = async () => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('wedding_reservations')
-        .select('*')
-        .eq('id', reservationId)
-        .maybeSingle();
-      if (error) throw error;
-      setReservation(data);
+      const all = await fetchAllReservations(token.access_token, token.token_type);
+      const found = all.find((r) => r.id === reservationId);
+      setReservation(found ? apiReservationToWeddingReservation(found) : null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -208,8 +204,6 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
       </View>
     );
   }
-
-  const tables = ['Τράπεζα 1', 'Τράπεζα 2', 'Τράπεζα 3', 'Τράπεζα 4', 'Τράπεζα 5', 'Τράπεζα 6', 'Τράπεζα 7', 'Τράπεζα 8'];
 
   return (
     <ScrollView className="flex-1 bg-wed-bg" contentContainerClassName="min-h-screen flex flex-col">
@@ -293,7 +287,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                     <Text className="font-semibold text-gray-900">{reservation.guest_count}</Text>
                   </View>
                 </Pressable>
-                {reservation.package_type && (
+                {reservation.package_type ? (
                   <View className="flex-row gap-3">
                     <View className="p-2 bg-wed-accent-lighter rounded-lg">
                       <Package size={20} color="#C28B84" />
@@ -303,7 +297,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                       <Text className="font-semibold text-gray-900">{reservation.package_type}</Text>
                     </View>
                   </View>
-                )}
+                ) : null}
               </View>
               <View className="flex-1 min-w-[200px] gap-4">
                 <View className="flex-row gap-3">
@@ -315,7 +309,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                     <Text className="font-semibold text-gray-900 break-all">{reservation.contact_email}</Text>
                   </View>
                 </View>
-                {reservation.contact_phone && (
+                {reservation.contact_phone ? (
                   <View className="flex-row gap-3">
                     <View className="p-2 bg-wed-accent-lighter rounded-lg">
                       <Phone size={20} color="#C28B84" />
@@ -325,8 +319,8 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                       <Text className="font-semibold text-gray-900">{reservation.contact_phone}</Text>
                     </View>
                   </View>
-                )}
-                {reservation.budget > 0 && (
+                ) : null}
+                {reservation.budget > 0 ? (
                   <Pressable onPress={() => setShowBudgetAnalysis(true)} className="flex-row gap-3">
                     <View className="p-2 bg-wed-accent-lighter rounded-lg">
                       <DollarSign size={20} color="#C28B84" />
@@ -336,7 +330,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                       <Text className="font-semibold text-gray-900">${reservation.budget.toLocaleString()}</Text>
                     </View>
                   </Pressable>
-                )}
+                ) : null}
                 <View className="flex-row gap-3">
                   <View className="p-2 bg-wed-accent-lighter rounded-lg">
                     <Clock size={20} color="#C28B84" />
@@ -348,7 +342,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                 </View>
               </View>
             </View>
-            {reservation.notes && (
+            {reservation.notes ? (
               <View className="pt-6 border-t border-gray-200">
                 <View className="flex-row gap-3">
                   <View className="p-2 bg-wed-accent-lighter rounded-lg">
@@ -360,7 +354,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
                   </View>
                 </View>
               </View>
-            )}
+            ) : null}
           </View>
         </View>
       </View>
@@ -410,7 +404,7 @@ export function ReservationDetail({ reservationId, initialReservation, onBack }:
         }
       />
 
-      {/* Edit Modal — PATCH /reservations/{id} (ReservationsUpdateSchema) */}
+      {/* Edit Modal */}
       <Modal visible={showEditReservationModal} transparent animationType="fade">
         <Pressable className="flex-1 justify-center bg-black/50 p-4" onPress={() => setShowEditReservationModal(false)}>
           <Pressable
